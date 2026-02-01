@@ -10,10 +10,11 @@
 **/kubeconfig
 **/talosconfig
 
-# Terraform state
+# Terraform state and vars
 **/terraform.tfstate
 **/terraform.tfstate.*
 .terraform/
+**/terraform.tfvars
 
 # Flux
 **/flux-system/
