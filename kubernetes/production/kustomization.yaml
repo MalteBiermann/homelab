@@ -4,4 +4,5 @@ kind: Kustomization
 resources:
   - nginx-helloworld
   - traefik
-  - metallb
+  - metallb/metallb-kustomization.yaml
+  - metallb/metallb-config-kustomization.yaml
