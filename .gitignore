@@ -14,7 +14,7 @@
 **/terraform.tfstate
 **/terraform.tfstate.*
 .terraform/
-**/terraform.tfvars
+**/terraform.tfvars.secret
 
 # Flux
 **/flux-system/

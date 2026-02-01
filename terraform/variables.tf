@@ -177,3 +177,9 @@ variable "talos_cluster_endpoint" {
   type        = string
   default     = ""
 }
+
+variable "enable_talos" {
+  description = "Enable Talos resources"
+  type        = bool
+  default     = true
+}

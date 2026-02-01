@@ -20,7 +20,7 @@ output "vm_ipv4_addresses" {
 
 output "talos_controlplane_config" {
   description = "Talos control plane machine configurations per node"
-  value       = { for i, config in data.talos_machine_configuration.controlplane : i => config.machine_configuration }
+  value       = var.enable_talos ? { for i, config in data.talos_machine_configuration.controlplane : i => config.machine_configuration } : {}
   sensitive   = true
 }
 
@@ -31,13 +31,13 @@ output "cluster_endpoint" {
 
 output "talosconfig" {
   description = "Talos configuration for cluster management"
-  value       = data.talos_client_configuration.this.talos_config
+  value       = var.enable_talos ? data.talos_client_configuration.this[0].talos_config : null
   sensitive   = true
 }
 
 output "kubeconfig" {
   description = "Kubernetes configuration for cluster access"
-  value       = talos_cluster_kubeconfig.this.kubeconfig_raw
+  value       = var.enable_talos ? talos_cluster_kubeconfig.this[0].kubeconfig_raw : null
   sensitive   = true
 }
 

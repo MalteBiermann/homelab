@@ -1,14 +1,3 @@
-# Download Talos ISO from URL
-resource "proxmox_virtual_environment_download_file" "talos_image" {
-  node_name           = var.proxmox_node
-  content_type        = "iso"
-  datastore_id        = var.iso_datastore
-  file_name           = "talos-${var.talos_version}-nocloud-amd64.iso"
-  url                 = var.talos_image_url
-  overwrite           = true
-  overwrite_unmanaged = true
-}
-
 resource "proxmox_virtual_environment_vm" "vm" {
   count = var.vm_count
 
@@ -16,8 +5,6 @@ resource "proxmox_virtual_environment_vm" "vm" {
   description = "VM created by Terraform"
   node_name   = var.proxmox_node
   vm_id       = var.vm_id_start + count.index
-
-  depends_on = [proxmox_virtual_environment_download_file.talos_image]
 
   cpu {
     cores = var.vm_cpu_cores
@@ -34,6 +21,13 @@ resource "proxmox_virtual_environment_vm" "vm" {
     file_format  = var.vm_disk_format
     interface    = var.vm_disk_interface
     size         = var.vm_disk_size
+    aio          = "io_uring"
+    backup       = true
+    cache        = "none"
+    discard      = "ignore"
+    iothread     = false
+    replicate    = true
+    ssd          = false
   }
 
   # Data disk for Longhorn storage
@@ -42,6 +36,12 @@ resource "proxmox_virtual_environment_vm" "vm" {
     file_format  = var.vm_disk_format
     interface    = "scsi1"
     size         = var.data_disk_size
+    aio          = "io_uring"
+    backup       = true
+    cache        = "none"
+    discard      = "ignore"
+    iothread     = false
+    replicate    = true
     ssd          = true
   }
 
@@ -72,8 +72,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
   }
 
   cdrom {
-    enabled = true
-    file_id = proxmox_virtual_environment_download_file.talos_image.id
+    file_id   = "local:iso/talos-${var.talos_version}-nocloud-amd64.iso"
     interface = "ide3"
   }
 
@@ -90,5 +89,12 @@ resource "proxmox_virtual_environment_vm" "vm" {
   on_boot = var.vm_on_boot
   started = var.vm_started
   
-  stop_on_destroy = true  # Hard shutdown - don't wait for graceful stop
+  stop_on_destroy = false  # Match current Proxmox state
+
+  lifecycle {
+    ignore_changes = [
+      disk,
+      cdrom,
+    ]
+  }
 }
