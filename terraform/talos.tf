@@ -1,16 +1,18 @@
 # Generate Talos machine secrets
 resource "talos_machine_secrets" "this" {
-  count = var.enable_talos ? 1 : 0
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 # Generate Talos machine configuration for each control plane node with unique static IPs
 data "talos_machine_configuration" "controlplane" {
-  count = var.enable_talos ? var.vm_count : 0
+  count = var.vm_count
 
   cluster_name       = var.talos_cluster_name
   cluster_endpoint   = var.talos_cluster_endpoint != "" ? var.talos_cluster_endpoint : "https://${split("/", var.vm_ipv4_addresses[0])[0]}:6443"
   machine_type       = "controlplane"
-  machine_secrets    = talos_machine_secrets.this[0].machine_secrets
+  machine_secrets    = talos_machine_secrets.this.machine_secrets
   kubernetes_version = var.kubernetes_version
   
   docs     = false
@@ -46,7 +48,9 @@ data "talos_machine_configuration" "controlplane" {
         }
         # Configure kubelet for Longhorn with proper mount propagation
         kubelet = {
-          nodeIP = split("/", var.vm_cluster_ipv4_addresses[count.index])[0]
+          nodeIP = {
+            validSubnets = ["10.10.0.0/24"]
+          }
           extraMounts = [
             {
               destination = "/var/lib/longhorn"
@@ -113,18 +117,17 @@ data "talos_machine_configuration" "controlplane" {
 
 # Generate talosconfig
 data "talos_client_configuration" "this" {
-  count                = var.enable_talos ? 1 : 0
   cluster_name         = var.talos_cluster_name
-  client_configuration = talos_machine_secrets.this[0].client_configuration
+  client_configuration = talos_machine_secrets.this.client_configuration
   nodes                = [for ip in var.vm_ipv4_addresses : split("/", ip)[0]]
   endpoints            = [for ip in var.vm_ipv4_addresses : split("/", ip)[0]]
 }
 
 # Apply Talos configuration to each node
 resource "talos_machine_configuration_apply" "controlplane" {
-  count = var.enable_talos ? var.vm_count : 0
+  count = var.vm_count
 
-  client_configuration        = talos_machine_secrets.this[0].client_configuration
+  client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane[count.index].machine_configuration
   
   endpoint = split("/", var.vm_ipv4_addresses[count.index])[0]
@@ -141,8 +144,7 @@ resource "talos_machine_configuration_apply" "controlplane" {
 
 # Bootstrap the Talos cluster on the first control plane node
 resource "talos_machine_bootstrap" "this" {
-  count                = var.enable_talos ? 1 : 0
-  client_configuration = talos_machine_secrets.this[0].client_configuration
+  client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = split("/", var.vm_ipv4_addresses[0])[0]
   node                 = split("/", var.vm_ipv4_addresses[0])[0]
 
@@ -157,7 +159,7 @@ resource "talos_machine_bootstrap" "this" {
 
 # Upgrade Talos nodes to specified version with extensions
 resource "null_resource" "talos_upgrade" {
-  count = var.enable_talos ? var.vm_count : 0
+  count = var.vm_count
 
   triggers = {
     talos_version = var.talos_version
@@ -171,7 +173,7 @@ resource "null_resource" "talos_upgrade" {
       
       # Write temporary talosconfig for this upgrade
       cat > /tmp/talosconfig-upgrade-${split("/", var.vm_ipv4_addresses[count.index])[0]}.yaml <<'EOF'
-    ${data.talos_client_configuration.this[0].talos_config}
+    ${data.talos_client_configuration.this.talos_config}
     EOF
       export TALOSCONFIG=/tmp/talosconfig-upgrade-${split("/", var.vm_ipv4_addresses[count.index])[0]}.yaml
       
@@ -198,14 +200,13 @@ resource "null_resource" "talos_upgrade" {
   ]
   
   lifecycle {
-    ignore_changes = [triggers["node_ip"]]
+    ignore_changes = all
   }
 }
 
 # Retrieve kubeconfig after cluster is bootstrapped
 resource "talos_cluster_kubeconfig" "this" {
-  count                = var.enable_talos ? 1 : 0
-  client_configuration = talos_machine_secrets.this[0].client_configuration
+  client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = split("/", var.vm_ipv4_addresses[0])[0]
   node                 = split("/", var.vm_ipv4_addresses[0])[0]
 

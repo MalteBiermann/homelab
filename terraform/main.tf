@@ -89,7 +89,9 @@ resource "proxmox_virtual_environment_vm" "vm" {
   on_boot = var.vm_on_boot
   started = var.vm_started
   
-  stop_on_destroy = false  # Match current Proxmox state
+  stop_on_destroy    = true  # Force stop on destroy
+  timeout_shutdown_vm = 10
+  timeout_stop_vm     = 10
 
   lifecycle {
     ignore_changes = [

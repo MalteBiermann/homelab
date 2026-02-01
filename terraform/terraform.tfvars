@@ -65,7 +65,5 @@ talos_cluster_name     = "talos-proxmox-cluster"
 kubernetes_version     = "1.35.0"
 talos_cluster_endpoint = ""  # Leave empty to use first node IP, or set VIP/LB address
 
-# Skip Talos resources for now
-enable_talos = false
 
 
