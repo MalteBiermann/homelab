@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Local secrets
+**/secret.env
+**/*.agekey
+**/*.sops.yaml
+
+# Kube/Talos configs
+**/kubeconfig
+**/talosconfig
+
+# Terraform state
+**/terraform.tfstate
+**/terraform.tfstate.*
+.terraform/
+
+# Flux
+**/flux-system/
+
+# Logs
+*.log

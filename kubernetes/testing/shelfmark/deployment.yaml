@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shelfmark
+  namespace: books
+  labels:
+    helm.sh/chart: shelfmark-0.1.0
+    app.kubernetes.io/name: shelfmark
+    app.kubernetes.io/instance: shelfmark
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Kustomize
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shelfmark
+      app.kubernetes.io/instance: shelfmark
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shelfmark
+        app.kubernetes.io/instance: shelfmark
+        app.kubernetes.io/version: "latest"
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: shelfmark
+          image: ghcr.io/calibrain/shelfmark:1.0.3
+          ports:
+            - containerPort: 8084
+              name: http
+              protocol: TCP
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: books
+              mountPath: /books
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: shelfmark-config
+        - name: books
+          persistentVolumeClaim:
+            claimName: transfer-books

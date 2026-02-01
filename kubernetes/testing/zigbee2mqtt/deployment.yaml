@@ -1,0 +1,107 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zigbee2mqtt
+  namespace: zigbee2mqtt
+  labels:
+    app: zigbee2mqtt
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: zigbee2mqtt
+  template:
+    metadata:
+      labels:
+        app: zigbee2mqtt
+    spec:
+      securityContext:
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+      - name: create-config
+        image: busybox:1.36
+        command: 
+        - sh
+        - -c
+        - |
+          if [ ! -f /app/data/configuration.yaml ]; then
+            echo "Creating minimal configuration..."
+            cat > /app/data/configuration.yaml << 'EOF'
+          version: 4
+          mqtt:
+              base_topic: zigbee2mqtt
+              server: mqtt://mosquitto.mosquitto.svc.cluster.local:1883
+          serial:
+              port: /dev/ttyACM0
+              adapter: ember
+          advanced:
+              channel: 15
+              network_key: GENERATE
+              pan_id: GENERATE
+              ext_pan_id: GENERATE
+          frontend:
+              enabled: true
+          homeassistant:
+              enabled: true
+          EOF
+            chmod 664 /app/data/configuration.yaml
+            echo "Configuration created successfully"
+          else
+            echo "Configuration already exists, skipping"
+          fi
+        volumeMounts:
+        - name: data
+          mountPath: /app/data
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+      containers:
+      - name: zigbee2mqtt
+        image: koenkk/zigbee2mqtt:2.7.2
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: TZ
+          value: Europe/Berlin
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          privileged: false
+          readOnlyRootFilesystem: false
+        volumeMounts:
+        - name: data
+          mountPath: /app/data
+        # Uncomment and adjust for USB Zigbee coordinator
+        # - name: zigbee-device
+        #   mountPath: /dev/ttyACM0
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: zigbee2mqtt-data
+      # Uncomment for USB Zigbee coordinator access
+      # - name: zigbee-device
+      #   hostPath:
+      #     path: /dev/ttyACM0
+      #     type: CharDevice
+      # nodeSelector:
+      #   kubernetes.io/hostname: <node-with-zigbee-usb>

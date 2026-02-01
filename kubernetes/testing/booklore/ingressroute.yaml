@@ -1,0 +1,27 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: booklore
+  namespace: books
+  labels:
+    helm.sh/chart: booklore-0.1.0
+    app.kubernetes.io/name: booklore
+    app.kubernetes.io/instance: booklore
+    app.kubernetes.io/version: "0.38.2"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: "booklore.local.biermann.uk"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: booklore
+                port:
+                  number: 6060

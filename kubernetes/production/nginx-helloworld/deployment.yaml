@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-helloworld
+  namespace: nginx-helloworld
+  labels:
+    app: nginx-helloworld
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-helloworld
+  template:
+    metadata:
+      labels:
+        app: nginx-helloworld
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+      initContainers:
+      - name: install
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          echo '<html><body><h1>Hello World from Nginx!</h1><p>Welcome to your Kubernetes cluster.</p></body></html>' > /html/index.html
+        volumeMounts:
+        - name: html
+          mountPath: /html
+      volumes:
+      - name: html
+        emptyDir: {}

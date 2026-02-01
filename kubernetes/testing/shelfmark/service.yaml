@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shelfmark
+  namespace: books
+  labels:
+    helm.sh/chart: shelfmark-0.1.0
+    app.kubernetes.io/name: shelfmark
+    app.kubernetes.io/instance: shelfmark
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Kustomize
+spec:
+  selector:
+    app.kubernetes.io/name: shelfmark
+    app.kubernetes.io/instance: shelfmark
+  ports:
+    - port: 8084
+      targetPort: http
+      name: http
+      protocol: TCP
+  type: ClusterIP
