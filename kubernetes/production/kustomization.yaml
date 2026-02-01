@@ -7,3 +7,4 @@ resources:
   - traefik
   - metallb/metallb-kustomization.yaml
   - metallb/metallb-config-kustomization.yaml
+  - mosquitto
