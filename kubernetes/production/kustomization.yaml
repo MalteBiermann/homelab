@@ -10,3 +10,5 @@ resources:
   - mosquitto
   - booklore
   - shelfmark
+  - homeassistant
+  - zigbee2mqtt
