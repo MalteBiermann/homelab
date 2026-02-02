@@ -8,7 +8,7 @@ metadata:
     helm.sh/chart: booklore-0.1.0
     app.kubernetes.io/name: booklore
     app.kubernetes.io/instance: booklore
-    app.kubernetes.io/version: "develop-91c03825"
+    app.kubernetes.io/version: "v1.18.5"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -21,7 +21,7 @@ spec:
       labels:
         app.kubernetes.io/name: booklore
         app.kubernetes.io/instance: booklore
-        app.kubernetes.io/version: "develop-91c03825"
+        app.kubernetes.io/version: "v1.18.5"
     spec:
       serviceAccountName: booklore
       initContainers:
@@ -46,7 +46,7 @@ spec:
               memory: 32Mi
       containers:
         - name: booklore
-          image: booklore/booklore:develop-91c03825
+          image: booklore/booklore:v1.18.5
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
