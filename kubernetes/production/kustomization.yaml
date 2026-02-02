@@ -8,3 +8,5 @@ resources:
   - metallb/metallb-kustomization.yaml
   - metallb/metallb-config-kustomization.yaml
   - mosquitto
+  - booklore
+  - shelfmark

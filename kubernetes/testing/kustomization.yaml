@@ -4,6 +4,4 @@ kind: Kustomization
 resources:
   - zigbee2mqtt
   - homeassistant
-  - booklore
-  - shelfmark
 
