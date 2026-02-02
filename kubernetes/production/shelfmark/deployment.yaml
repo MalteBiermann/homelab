@@ -8,7 +8,7 @@ metadata:
     helm.sh/chart: shelfmark-0.1.0
     app.kubernetes.io/name: shelfmark
     app.kubernetes.io/instance: shelfmark
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.3"
     app.kubernetes.io/managed-by: Kustomize
 spec:
   replicas: 1
@@ -21,7 +21,7 @@ spec:
       labels:
         app.kubernetes.io/name: shelfmark
         app.kubernetes.io/instance: shelfmark
-        app.kubernetes.io/version: "latest"
+        app.kubernetes.io/version: "1.0.3"
     spec:
       securityContext:
         fsGroup: 1000
