@@ -1,0 +1,4 @@
+creation_rules:
+  - path_regex: kubernetes/.*/.*/secret\.env$
+    encrypted_regex: '^(.*)$'
+    age: age14atxlv5fzr7jqqwq54muha6v727cylhu6kudecds0yqvut2urf2q2r2l4z

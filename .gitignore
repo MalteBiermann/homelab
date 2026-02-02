@@ -2,9 +2,7 @@
 .DS_Store
 
 # Local secrets
-**/secret.env
 **/*.agekey
-**/*.sops.yaml
 
 # Kube/Talos configs
 **/kubeconfig
