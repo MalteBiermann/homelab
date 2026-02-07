@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wikijs-postgres
+  namespace: wikijs
+  labels:
+    app.kubernetes.io/name: wikijs-postgres
+    app.kubernetes.io/instance: wikijs
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: wikijs-postgres
+    app.kubernetes.io/instance: wikijs
+  ports:
+    - port: 5432
+      targetPort: postgres
+      protocol: TCP
+      name: postgres

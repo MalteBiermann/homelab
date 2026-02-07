@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-dns
+  namespace: traefik
+  annotations:
+    metallb.universe.tf/address-pool: default-pool
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: traefik
+    app.kubernetes.io/instance: traefik-traefik
+  ports:
+    - name: dns
+      port: 53
+      protocol: TCP
+      targetPort: dns

@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: code-server-data
+  namespace: code-server
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi

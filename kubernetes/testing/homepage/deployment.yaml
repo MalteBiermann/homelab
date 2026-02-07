@@ -1,0 +1,50 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homepage
+  namespace: homepage
+  labels:
+    app.kubernetes.io/name: homepage
+    app.kubernetes.io/instance: homepage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: homepage
+      app.kubernetes.io/instance: homepage
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: homepage
+        app.kubernetes.io/instance: homepage
+    spec:
+      containers:
+        - name: homepage
+          image: ghcr.io/gethomepage/homepage:v0.9.12
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+          env:
+            - name: LOG_LEVEL
+              value: info
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+            - name: data
+              mountPath: /app/config/custom
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: config
+          configMap:
+            name: homepage-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: homepage-data

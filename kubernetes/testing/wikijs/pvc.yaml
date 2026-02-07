@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wikijs-postgres-data
+  namespace: wikijs
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wikijs-uploads
+  namespace: wikijs
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 2Gi

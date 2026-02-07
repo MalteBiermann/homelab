@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-app-content
+  namespace: sample-app
+data:
+  index.html: |
+    <html>
+      <head>
+        <title>Sample App</title>
+        <style>
+          body { font-family: sans-serif; margin: 3rem; }
+          h1 { color: #0f62fe; }
+        </style>
+      </head>
+      <body>
+        <h1>Sample Application</h1>
+        <p>This sample shows how to combine namespaces, PVCs, Deployments, Services, and Ingress.</p>
+      </body>
+    </html>

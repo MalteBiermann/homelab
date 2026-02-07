@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-config
+  namespace: homepage
+data:
+  settings.yaml: |
+    title: Homelab
+    theme: dark
+    target: _self
+  services.yaml: |
+    - name: Cluster
+      items:
+        - name: Kubernetes Dashboard
+          description: API server proxy
+          href: https://kubernetes.default.svc
+          icon: kubernetes
+  bookmarks.yaml: |
+    - Developer
+    - Homelab

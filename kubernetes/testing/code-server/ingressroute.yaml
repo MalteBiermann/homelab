@@ -1,0 +1,21 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: code-server
+  namespace: code-server
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: "code-server.local.biermann.uk"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: code-server
+                port:
+                  number: 8080

@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: code-server
+  namespace: code-server
+  labels:
+    app.kubernetes.io/name: code-server
+    app.kubernetes.io/instance: code-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: code-server
+      app.kubernetes.io/instance: code-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: code-server
+        app.kubernetes.io/instance: code-server
+    spec:
+      containers:
+        - name: code-server
+          image: coder/code-server:4.92.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: code-server-credentials
+                  key: PASSWORD
+            - name: TZ
+              value: Europe/Berlin
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /home/coder/.local/share/code-server
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: code-server-data

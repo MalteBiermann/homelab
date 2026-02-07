@@ -1,0 +1,21 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: librespeed
+  namespace: librespeed
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: "librespeed.local.biermann.uk"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: librespeed
+                port:
+                  number: 80

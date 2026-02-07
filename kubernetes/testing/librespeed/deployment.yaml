@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: librespeed
+  namespace: librespeed
+  labels:
+    app.kubernetes.io/name: librespeed
+    app.kubernetes.io/instance: librespeed
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: librespeed
+      app.kubernetes.io/instance: librespeed
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: librespeed
+        app.kubernetes.io/instance: librespeed
+    spec:
+      containers:
+        - name: librespeed
+          image: ghcr.io/linuxserver/librespeed:latest
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: Europe/Berlin
+            - name: MODE
+              value: standalone
+            - name: PASSWORD
+              value: changeme
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

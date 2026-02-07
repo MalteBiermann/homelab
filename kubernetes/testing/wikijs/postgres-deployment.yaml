@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wikijs-postgres
+  namespace: wikijs
+  labels:
+    app.kubernetes.io/name: wikijs-postgres
+    app.kubernetes.io/instance: wikijs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wikijs-postgres
+      app.kubernetes.io/instance: wikijs
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wikijs-postgres
+        app.kubernetes.io/instance: wikijs
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16.3
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: wikijs-database
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: wikijs-database
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wikijs-database
+                  key: POSTGRES_PASSWORD
+          ports:
+            - containerPort: 5432
+              name: postgres
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: wikijs-postgres-data

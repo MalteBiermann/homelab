@@ -36,6 +36,10 @@ spec:
           port: 1883
           exposedPort: 1883
           protocol: TCP
+        dns:
+          port: 53
+          exposedPort: 53
+          protocol: TCP
     
     # Enable dashboard
     ingressRoute:
@@ -51,8 +55,14 @@ spec:
         port: 443
         exposedPort: 443
       mqtt:
+        expose: true
         port: 1883
         exposedPort: 1883
+        protocol: TCP
+      dns:
+        expose: true
+        port: 53
+        exposedPort: 53
         protocol: TCP
       
     # Enable access logs
