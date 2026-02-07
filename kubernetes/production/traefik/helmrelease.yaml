@@ -51,19 +51,25 @@ spec:
       web:
         port: 80
         exposedPort: 80
+        expose:
+          default: true
       websecure:
         port: 443
         exposedPort: 443
+        expose:
+          default: true
       mqtt:
-        expose: true
         port: 1883
         exposedPort: 1883
         protocol: TCP
+        expose:
+          default: true
       dns:
-        expose: true
         port: 53
         exposedPort: 53
         protocol: TCP
+        expose:
+          default: true
       
     # Enable access logs
     logs:
