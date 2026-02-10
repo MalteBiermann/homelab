@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streamripper-next
+  namespace: streamripper-next
+  labels:
+    app.kubernetes.io/name: streamripper-next
+    app.kubernetes.io/instance: streamripper-next
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: streamripper-next
+      app.kubernetes.io/instance: streamripper-next
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: streamripper-next
+        app.kubernetes.io/instance: streamripper-next
+    spec:
+      containers:
+        - name: streamripper-next
+          image: ghcr.io/maltebiermann/streamripper-next:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: Europe/Berlin
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: data
+              mountPath: /data
+              subPath: data
+            - name: data
+              mountPath: /var/lib/streamripper
+              subPath: state
+            - name: data
+              mountPath: /var/log/streamripper
+              subPath: logs
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+      volumes:
+        - name: config
+          configMap:
+            name: streamripper-next-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: streamripper-next-data

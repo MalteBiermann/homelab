@@ -9,6 +9,7 @@ resources:
   - librespeed
   - portainer
   - streamripper
+  - streamripper-next
   - wikijs
 
 
