@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: streamripper-music
+  name: streamripper-output
   namespace: streamripper
 spec:
   accessModes:

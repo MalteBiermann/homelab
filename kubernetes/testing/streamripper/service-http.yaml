@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: streamripper-http
+  namespace: streamripper
+  labels:
+    app.kubernetes.io/name: streamripper
+    app.kubernetes.io/instance: streamripper
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: streamripper
+    app.kubernetes.io/instance: streamripper
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP

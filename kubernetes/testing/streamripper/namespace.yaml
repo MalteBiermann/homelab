@@ -6,3 +6,6 @@ metadata:
   labels:
     app.kubernetes.io/name: streamripper
     app.kubernetes.io/instance: streamripper
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline
