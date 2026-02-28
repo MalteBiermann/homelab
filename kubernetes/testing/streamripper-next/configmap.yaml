@@ -19,3 +19,166 @@ data:
           time_selector: "td:nth-child(1)"
           time_format: "%H:%M"
           schedule_is_for: "tomorrow"
+  file-manager.py: |
+    from flask import Flask, render_template_string, request, send_file, jsonify
+    import os
+    from pathlib import Path
+    
+    app = Flask(__name__)
+    DATA_DIR = '/data'
+    
+    HTML_TEMPLATE = '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Streamripper File Manager</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+            .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+            h1 { color: #333; }
+            .file-list { margin-top: 20px; }
+            .file-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+            .file-item:hover { background: #f9f9f9; }
+            .file-info { flex: 1; }
+            .file-name { font-weight: bold; color: #0066cc; }
+            .file-size { color: #666; font-size: 0.9em; }
+            .file-actions { margin-left: 20px; }
+            button { padding: 8px 15px; margin: 0 5px; cursor: pointer; border: none; border-radius: 4px; }
+            .btn-download { background: #4CAF50; color: white; }
+            .btn-download:hover { background: #45a049; }
+            .btn-delete { background: #f44336; color: white; }
+            .btn-delete:hover { background: #da190b; }
+            .stats { background: #e8f5e9; padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+            .empty { text-align: center; color: #999; padding: 40px; }
+            .loading { color: #666; font-style: italic; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>📻 Streamripper File Manager</h1>
+            <div class="stats">
+                <p><strong>Total Files:</strong> <span id="file-count">0</span> | 
+                   <strong>Total Size:</strong> <span id="total-size">0 MB</span></p>
+            </div>
+            <div id="file-list" class="file-list">
+                <p class="loading">Loading files...</p>
+            </div>
+        </div>
+        <script>
+            function formatBytes(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+            }
+            
+            function loadFiles() {
+                fetch('/api/files')
+                    .then(r => r.json())
+                    .then(data => {
+                        const container = document.getElementById('file-list');
+                        document.getElementById('file-count').textContent = data.files.length;
+                        document.getElementById('total-size').textContent = formatBytes(data.total_size);
+                        
+                        if (data.files.length === 0) {
+                            container.innerHTML = '<p class="empty">No files found</p>';
+                            return;
+                        }
+                        
+                        container.innerHTML = data.files.map(f => `
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-name">🎵 ${f.name}</div>
+                                    <div class="file-size">${formatBytes(f.size)}</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="btn-download" onclick="downloadFile('${f.name}')">Download</button>
+                                    <button class="btn-delete" onclick="deleteFile('${f.name}')">Delete</button>
+                                </div>
+                            </div>
+                        `).join('');
+                    });
+            }
+            
+            function downloadFile(name) {
+                window.location.href = `/download/${encodeURIComponent(name)}`;
+            }
+            
+            function deleteFile(name) {
+                if (confirm(`Delete ${name}?`)) {
+                    fetch(`/api/delete/${encodeURIComponent(name)}`, { method: 'DELETE' })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                loadFiles();
+                            } else {
+                                alert('Error: ' + data.error);
+                            }
+                        });
+                }
+            }
+            
+            loadFiles();
+            setInterval(loadFiles, 5000);
+        </script>
+    </body>
+    </html>
+    '''
+    
+    @app.route('/')
+    def index():
+        return render_template_string(HTML_TEMPLATE)
+    
+    @app.route('/api/files')
+    def list_files():
+        try:
+            files = []
+            total_size = 0
+            for root, dirs, filenames in os.walk(DATA_DIR):
+                for filename in filenames:
+                    if filename.endswith(('.mp3', '.wav', '.flac', '.aac')):
+                        filepath = os.path.join(root, filename)
+                        size = os.path.getsize(filepath)
+                        rel_path = os.path.relpath(filepath, DATA_DIR)
+                        files.append({'name': rel_path, 'size': size})
+                        total_size += size
+            files.sort(key=lambda x: x['name'], reverse=True)
+            return jsonify({'files': files, 'total_size': total_size})
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    
+    @app.route('/download/<path:filename>')
+    def download_file(filename):
+        try:
+            filepath = os.path.join(DATA_DIR, filename)
+            if not os.path.abspath(filepath).startswith(os.path.abspath(DATA_DIR)):
+                return 'Invalid path', 403
+            if not os.path.exists(filepath):
+                return 'File not found', 404
+            return send_file(filepath, as_attachment=True)
+        except Exception as e:
+            return str(e), 500
+    
+    @app.route('/api/delete/<path:filename>', methods=['DELETE'])
+    def delete_file(filename):
+        try:
+            filepath = os.path.join(DATA_DIR, filename)
+            if not os.path.abspath(filepath).startswith(os.path.abspath(DATA_DIR)):
+                return jsonify({'error': 'Invalid path'}), 403
+            if not os.path.exists(filepath):
+                return jsonify({'error': 'File not found'}), 404
+            os.remove(filepath)
+            try:
+                dir_path = os.path.dirname(filepath)
+                while dir_path != DATA_DIR and os.path.isdir(dir_path) and not os.listdir(dir_path):
+                    os.rmdir(dir_path)
+                    dir_path = os.path.dirname(dir_path)
+            except:
+                pass
+            return jsonify({'success': True})
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    
+    if __name__ == '__main__':
+        app.run(host='0.0.0.0', port=5000, debug=False)

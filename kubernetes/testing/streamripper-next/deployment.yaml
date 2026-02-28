@@ -19,6 +19,9 @@ spec:
         app.kubernetes.io/name: streamripper-next
         app.kubernetes.io/instance: streamripper-next
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: streamripper-next
           image: ghcr.io/maltebiermann/streamripper-next:latest
@@ -45,10 +48,44 @@ spec:
             limits:
               cpu: 500m
               memory: 1Gi
+        - name: file-manager
+          image: python:3.11-slim
+          workingDir: /app
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          command:
+            - sh
+            - -c
+            - |
+              pip install flask -q && python file-manager.py
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - name: app
+              mountPath: /app
+            - name: data
+              mountPath: /data
+              subPath: data
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 512Mi
       volumes:
         - name: config
           configMap:
             name: streamripper-next-config
+        - name: app
+          configMap:
+            name: streamripper-next-config
+            items:
+            - key: file-manager.py
+              path: file-manager.py
         - name: data
           persistentVolumeClaim:
             claimName: streamripper-next-data
