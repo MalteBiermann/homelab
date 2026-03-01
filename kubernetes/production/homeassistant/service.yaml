@@ -13,5 +13,13 @@ spec:
     targetPort: 8123
     protocol: TCP
     name: http
+  - port: 5353
+    targetPort: 5353
+    protocol: UDP
+    name: mdns
+  - port: 21063
+    targetPort: 21063
+    protocol: TCP
+    name: homekit
   selector:
     app: homeassistant
