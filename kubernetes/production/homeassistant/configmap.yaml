@@ -26,9 +26,9 @@ data:
     
     zeroconf:
     
-    homekit:
-      port: 21063
-      ip_address: 0.0.0.0
+    # homekit:
+    #   port: 21063
+    #   ip_address: 0.0.0.0
     
     logger:
       default: info
