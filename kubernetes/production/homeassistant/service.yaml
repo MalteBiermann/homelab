@@ -21,5 +21,9 @@ spec:
     targetPort: 21063
     protocol: TCP
     name: homekit
+  - port: 21064
+    targetPort: 21064
+    protocol: TCP
+    name: homekit-alt
   selector:
     app: homeassistant

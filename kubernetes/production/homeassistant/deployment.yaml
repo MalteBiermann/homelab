@@ -35,6 +35,9 @@ spec:
         - containerPort: 21063
           name: homekit
           protocol: TCP
+        - containerPort: 21064
+          name: homekit-alt
+          protocol: TCP
         env:
         - name: TZ
           value: Europe/Berlin
