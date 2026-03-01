@@ -24,6 +24,6 @@ data:
     
     mobile_app:
     
-    homekit:
-      ip_address: 10.0.10.102
-      advertise_ip: 10.0.10.102
+    # homekit:
+    #   ip_address: 10.0.10.102
+    #   advertise_ip: 10.0.10.102
