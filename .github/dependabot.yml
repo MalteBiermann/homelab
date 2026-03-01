@@ -6,10 +6,11 @@ updates:
   #   directory: "/terraform"
   #   schedule:
   #     interval: "weekly"
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
+  # GitHub Actions updates disabled - no workflows in repository
+  # - package-ecosystem: "github-actions"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "weekly"
   - package-ecosystem: "docker"
     directory: "/kubernetes/production"
     schedule:
