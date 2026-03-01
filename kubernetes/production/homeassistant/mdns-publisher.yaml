@@ -1,0 +1,75 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mdns-publisher
+  namespace: homeassistant
+  labels:
+    app: mdns-publisher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mdns-publisher
+  template:
+    metadata:
+      labels:
+        app: mdns-publisher
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: mdns-publisher
+        image: python:3.12-alpine
+        command:
+          - python3
+          - -c
+          - |
+            import subprocess, sys
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "zeroconf"])
+
+            import socket
+            import signal
+            import time
+            from zeroconf import Zeroconf, ServiceInfo
+
+            def shutdown(signum, frame):
+                print("Shutting down mDNS publisher...")
+                zc.unregister_service(ha_bridge)
+                zc.close()
+                sys.exit(0)
+
+            signal.signal(signal.SIGTERM, shutdown)
+            signal.signal(signal.SIGINT, shutdown)
+
+            ha_bridge = ServiceInfo(
+                "_hap._tcp.local.",
+                "Home Assistant Bridge._hap._tcp.local.",
+                server="homeassistant.local.",
+                addresses=[socket.inet_aton("10.0.10.102")],
+                port=21063,
+                properties={
+                    "md": "Home Assistant Bridge",
+                    "pv": "1.1",
+                    "id": "49:A7:8F:DD:40:43",
+                    "c#": "14",
+                    "s#": "1",
+                    "sf": "1",
+                    "ff": "0",
+                    "ci": "2",
+                },
+            )
+
+            zc = Zeroconf()
+            zc.register_service(ha_bridge)
+            print("Published Home Assistant Bridge on _hap._tcp (10.0.10.102:21063)")
+
+            while True:
+                time.sleep(60)
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 50m
+          limits:
+            memory: 128Mi
+            cpu: 200m
