@@ -26,3 +26,9 @@ data:
     
     homekit:
       port: 21063
+      ip_address: 0.0.0.0
+    
+    logger:
+      default: info
+      logs:
+        homeassistant.components.homekit: debug
