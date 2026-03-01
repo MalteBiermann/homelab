@@ -103,5 +103,5 @@ spec:
       #   hostPath:
       #     path: /dev/ttyACM0
       #     type: CharDevice
-      # nodeSelector:
-      #   kubernetes.io/hostname: <node-with-zigbee-usb>
+      nodeSelector:
+        zigbee: "true"
