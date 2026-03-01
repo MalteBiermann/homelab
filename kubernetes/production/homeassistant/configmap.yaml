@@ -26,5 +26,5 @@ data:
     
     homekit:
       port: 21063
-      ip_address: 10.0.10.102
+      ip_address: 0.0.0.0
       advertise_ip: 10.0.10.102
