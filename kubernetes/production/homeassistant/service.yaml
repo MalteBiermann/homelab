@@ -17,8 +17,8 @@ spec:
     targetPort: 5353
     protocol: UDP
     name: mdns
-  - port: 21064
-    targetPort: 21064
+  - port: 21063
+    targetPort: 21063
     protocol: TCP
     name: homekit
   selector:
