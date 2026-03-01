@@ -32,7 +32,7 @@ spec:
         - containerPort: 5353
           name: mdns
           protocol: UDP
-        - containerPort: 21063
+        - containerPort: 21064
           name: homekit
           protocol: TCP
         env:
