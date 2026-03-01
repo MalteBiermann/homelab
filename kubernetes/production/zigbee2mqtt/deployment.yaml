@@ -37,7 +37,7 @@ spec:
               base_topic: zigbee2mqtt
               server: mqtt://mosquitto.mosquitto.svc.cluster.local:1883
           serial:
-              port: /dev/ttyACM0
+              port: auto
               adapter: ember
           advanced:
               channel: 15
@@ -75,18 +75,14 @@ spec:
         - name: TZ
           value: Europe/Berlin
         securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          privileged: false
+          privileged: true
+          allowPrivilegeEscalation: true
           readOnlyRootFilesystem: false
         volumeMounts:
         - name: data
           mountPath: /app/data
-        # Uncomment and adjust for USB Zigbee coordinator
-        # - name: zigbee-device
-        #   mountPath: /dev/ttyACM0
+        - name: dev
+          mountPath: /dev
         resources:
           requests:
             memory: 256Mi
@@ -98,10 +94,9 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: zigbee2mqtt-data
-      # Uncomment for USB Zigbee coordinator access
-      # - name: zigbee-device
-      #   hostPath:
-      #     path: /dev/ttyACM0
-      #     type: CharDevice
+      - name: dev
+        hostPath:
+          path: /dev
+          type: Directory
       nodeSelector:
         zigbee: "true"
