@@ -1,9 +1,11 @@
 version: 2
 updates:
-  - package-ecosystem: "terraform"
-    directory: "/terraform"
-    schedule:
-      interval: "weekly"
+  # Terraform updates disabled due to Dependabot bug with hashicorp/kubernetes provider
+  # See: https://github.com/dependabot/dependabot-core/issues/XXXX
+  # - package-ecosystem: "terraform"
+  #   directory: "/terraform"
+  #   schedule:
+  #     interval: "weekly"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
