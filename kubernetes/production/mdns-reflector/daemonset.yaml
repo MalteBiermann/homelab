@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: mdns-reflector
+  namespace: mdns-reflector
+spec:
+  selector:
+    matchLabels:
+      app: mdns-reflector
+  template:
+    metadata:
+      labels:
+        app: mdns-reflector
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: avahi-daemon
+        image: alpine:latest
+        command:
+          - sh
+          - -c
+          - |
+            apk add --no-cache avahi avahi-tools dbus
+            # Start dbus (required for avahi)
+            mkdir -p /var/run/dbus
+            dbus-daemon --config-file=/etc/dbus-1/system.conf --print-address &
+            sleep 1
+            # Configure avahi for reflector mode
+            cat > /etc/avahi/avahi-daemon.conf <<EOF
+            [General]
+            interfaces=eth0,eth1
+            enable-reflector=yes
+            enable-dbus=yes
+            [publish]
+            reflect-ipv4=yes
+            reflect-ipv6=yes
+            EOF
+            # Start avahi daemon
+            avahi-daemon --no-rlimits -D
+            # Keep container running
+            tail -f /dev/null
+        securityContext:
+          privileged: true
+          allowPrivilegeEscalation: true
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 100m
+            memory: 256Mi
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
