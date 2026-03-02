@@ -25,5 +25,8 @@ data:
     mobile_app:
     
     automation: !include automations.yaml
-    script: !include scripts.yaml
-    scene: !include scenes.yaml
+    # script: !include scripts.yaml
+    # scene: !include scenes.yaml
+  automations.yaml:
+  # scripts.yaml:
+  # scenes.yaml:
