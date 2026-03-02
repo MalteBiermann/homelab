@@ -21,6 +21,21 @@ spec:
       containers:
       - name: mdns-publisher
         image: python:3.12-alpine
+        env:
+        - name: HA_SERVICE_IP
+          value: "10.0.10.102"
+        - name: HA_SERVER_NAME
+          value: "homeassistant.local."
+        - name: BRIDGE_CONFIGS
+          # JSON array of bridge definitions: name, port, mac
+          # mac is found in /config/.storage/homekit.<entry_id>.state
+          value: |
+            [
+              {"name": "Home Assistant Bridge", "port": 21063, "mac": "49:A7:8F:DD:40:43"},
+              {"name": "HASS Bridge", "port": 21064, "mac": "A2:CD:63:4E:BE:D6"}
+            ]
+        - name: PROBE_INTERVAL
+          value: "15"
         command:
           - python3
           - -c
@@ -28,44 +43,79 @@ spec:
             import subprocess, sys
             subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "zeroconf"])
 
-            import socket
-            import signal
-            import time
+            import json, os, socket, signal, time
             from zeroconf import Zeroconf, ServiceInfo
 
+            SERVICE_IP = os.environ["HA_SERVICE_IP"]
+            SERVER_NAME = os.environ["HA_SERVER_NAME"]
+            PROBE_INTERVAL = int(os.environ.get("PROBE_INTERVAL", "15"))
+            BRIDGES = json.loads(os.environ["BRIDGE_CONFIGS"])
+
+            zc = Zeroconf()
+            registered = {}  # port -> ServiceInfo
+            shutting_down = False
+
             def shutdown(signum, frame):
+                global shutting_down
+                shutting_down = True
                 print("Shutting down mDNS publisher...")
-                zc.unregister_service(ha_bridge)
+                for port, svc in registered.items():
+                    zc.unregister_service(svc)
+                    print(f"  Unregistered port {port}")
                 zc.close()
                 sys.exit(0)
 
             signal.signal(signal.SIGTERM, shutdown)
             signal.signal(signal.SIGINT, shutdown)
 
-            ha_bridge = ServiceInfo(
-                "_hap._tcp.local.",
-                "Home Assistant Bridge._hap._tcp.local.",
-                server="homeassistant.local.",
-                addresses=[socket.inet_aton("10.0.10.102")],
-                port=21063,
-                properties={
-                    "md": "Home Assistant Bridge",
-                    "pv": "1.1",
-                    "id": "49:A7:8F:DD:40:43",
-                    "c#": "14",
-                    "s#": "1",
-                    "sf": "1",
-                    "ff": "0",
-                    "ci": "2",
-                },
-            )
+            def probe_port(host, port, timeout=2):
+                try:
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.settimeout(timeout)
+                    s.connect((host, port))
+                    s.close()
+                    return True
+                except (ConnectionRefusedError, TimeoutError, OSError):
+                    return False
 
-            zc = Zeroconf()
-            zc.register_service(ha_bridge)
-            print("Published Home Assistant Bridge on _hap._tcp (10.0.10.102:21063)")
+            def make_service_info(bridge):
+                return ServiceInfo(
+                    "_hap._tcp.local.",
+                    f"{bridge['name']}._hap._tcp.local.",
+                    server=SERVER_NAME,
+                    addresses=[socket.inet_aton(SERVICE_IP)],
+                    port=bridge["port"],
+                    properties={
+                        "md": bridge["name"],
+                        "pv": "1.1",
+                        "id": bridge["mac"],
+                        "c#": "2",
+                        "s#": "1",
+                        "sf": "1",
+                        "ff": "0",
+                        "ci": "2",
+                    },
+                )
 
-            while True:
-                time.sleep(60)
+            print(f"mDNS publisher started — probing {SERVICE_IP} every {PROBE_INTERVAL}s")
+            print(f"Configured bridges: {[b['name'] + ':' + str(b['port']) for b in BRIDGES]}")
+
+            while not shutting_down:
+                for bridge in BRIDGES:
+                    port = bridge["port"]
+                    is_open = probe_port(SERVICE_IP, port)
+
+                    if is_open and port not in registered:
+                        svc = make_service_info(bridge)
+                        zc.register_service(svc)
+                        registered[port] = svc
+                        print(f"+ Published {bridge['name']} on port {port}")
+                    elif not is_open and port in registered:
+                        zc.unregister_service(registered[port])
+                        del registered[port]
+                        print(f"- Unpublished {bridge['name']} on port {port}")
+
+                time.sleep(PROBE_INTERVAL)
         resources:
           requests:
             memory: 64Mi
