@@ -24,14 +24,6 @@ data:
     
     mobile_app:
     
-    zeroconf:
-    
-    # homekit:
-    #   port: 21063
-    #   ip_address: 0.0.0.0
-    
-    # logger:
-    #   default: info
-    #   logs:
-    #     homeassistant.components.homekit: debug
-    #     pyhap: debug
+    automation: !include automations.yaml
+    script: !include scripts.yaml
+    scene: !include scenes.yaml
