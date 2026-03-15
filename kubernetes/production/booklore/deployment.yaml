@@ -8,7 +8,7 @@ metadata:
     helm.sh/chart: booklore-0.1.0
     app.kubernetes.io/name: booklore
     app.kubernetes.io/instance: booklore
-    app.kubernetes.io/version: "v1.18.5"
+    app.kubernetes.io/version: "v2.2.1"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -21,12 +21,12 @@ spec:
       labels:
         app.kubernetes.io/name: booklore
         app.kubernetes.io/instance: booklore
-        app.kubernetes.io/version: "v1.18.5"
+        app.kubernetes.io/version: "v2.2.1"
     spec:
       serviceAccountName: booklore
       initContainers:
         - name: wait-for-database
-          image: busybox:1.36
+          image: busybox:1.37.0
           command:
             - /bin/sh
             - -c
@@ -46,7 +46,7 @@ spec:
               memory: 32Mi
       containers:
         - name: booklore
-          image: booklore/booklore:v1.18.5
+          image: booklore/booklore:v2.2.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
