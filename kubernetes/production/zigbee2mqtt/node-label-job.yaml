@@ -41,7 +41,7 @@ spec:
       serviceAccountName: node-labeler
       containers:
       - name: labeler
-        image: bitnami/kubectl:latest
+        image: registry.k8s.io/kubectl:v1.34.5
         command:
         - /bin/sh
         - -c
