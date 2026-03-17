@@ -21,7 +21,7 @@ spec:
     spec:
       initContainers:
         - name: seed-content
-          image: busybox:1.36
+          image: busybox:1.37.0
           command:
             - /bin/sh
             - -c
@@ -36,7 +36,7 @@ spec:
               mountPath: /template
       containers:
         - name: sample
-          image: nginx:1.28.1-alpine
+          image: nginx:1.28.2-alpine
           ports:
             - containerPort: 80
               name: http

@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: streamripper
-          image: ghcr.io/maltebiermann/streamripper:latest
+          image: ghcr.io/maltebiermann/streamripper:20260301
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ

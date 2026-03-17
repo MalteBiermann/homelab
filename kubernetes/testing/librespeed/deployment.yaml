@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: librespeed
-          image: ghcr.io/linuxserver/librespeed:latest
+          image: ghcr.io/linuxserver/librespeed:5.2.4-ls56
           env:
             - name: PUID
               value: "1000"
