@@ -55,10 +55,10 @@ vm_on_boot     = true   # Start VM on host boot
 vm_started     = true   # Start VM after creation
 
 # Talos Image Configuration
-talos_version    = "v1.12.2"
-talos_image_url  = "https://factory.talos.dev/image/dc7b152cb3ea99b821fcb7340ce7168313ce393d663740b791c36f6e95fc8586/v1.12.2/nocloud-amd64.iso"
+talos_version    = "v1.12.6"
+talos_image_url  = "https://factory.talos.dev/image/dc7b152cb3ea99b821fcb7340ce7168313ce393d663740b791c36f6e95fc8586/v1.12.6/nocloud-amd64.iso"
 # Use official GitHub release (more reliable than Image Factory)
-#talos_image_url = "https://github.com/siderolabs/talos/releases/download/v1.12.2/nocloud-amd64.iso"
+#talos_image_url = "https://github.com/siderolabs/talos/releases/download/v1.12.6/nocloud-amd64.iso"
 
 # Talos Cluster Configuration
 talos_cluster_name     = "talos-proxmox-cluster"

@@ -151,13 +151,13 @@ variable "vm_started" {
 variable "talos_version" {
   description = "Talos version for naming the downloaded ISO"
   type        = string
-  default     = "v1.12.2"
+  default     = "v1.12.6"
 }
 
 variable "talos_image_url" {
   description = "URL to download Talos ISO"
   type        = string
-  default     = "https://github.com/siderolabs/talos/releases/download/v1.12.2/nocloud-amd64.iso"
+  default     = "https://github.com/siderolabs/talos/releases/download/v1.12.6/nocloud-amd64.iso"
 }
 
 variable "talos_cluster_name" {

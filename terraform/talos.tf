@@ -24,7 +24,7 @@ data "talos_machine_configuration" "controlplane" {
         install = {
           extensions = [
             {
-              image = "ghcr.io/siderolabs/iscsi-tools:v0.1.6"
+              image = "ghcr.io/siderolabs/iscsi-tools:v0.2.0"
             }
           ]
         }
