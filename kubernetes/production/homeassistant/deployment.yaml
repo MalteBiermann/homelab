@@ -59,6 +59,8 @@ spec:
         - name: proxy-config
           mountPath: /config/configuration.yaml
           subPath: configuration.yaml
+        - name: python-scripts
+          mountPath: /config/python_scripts
         resources:
           requests:
             memory: 512Mi
@@ -87,3 +89,6 @@ spec:
       - name: proxy-config
         configMap:
           name: homeassistant-config
+      - name: python-scripts
+        configMap:
+          name: homeassistant-python-scripts

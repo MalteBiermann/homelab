@@ -14,6 +14,8 @@ data:
       time_zone: Europe/Berlin
     
     frontend:
+
+    python_script:
     
     http:
       use_x_forwarded_for: true
@@ -27,6 +29,40 @@ data:
     automation: !include automations.yaml
     # script: !include scripts.yaml
     # scene: !include scenes.yaml
-  automations.yaml:
+  automations.yaml: |
+    - id: shellies_announce
+      alias: 'Shellies Announce'
+      triggers:
+        - trigger: homeassistant
+          event: start
+        - trigger: time_pattern
+          hours: "/1"
+      actions:
+        - action: mqtt.publish
+          data:
+            topic: shellies/command
+            payload: announce
+
+    - id: 'shellies_discovery'
+      alias: 'Shellies Discovery'
+      mode: queued
+      max: 999
+      triggers:
+        - trigger: mqtt
+          topic: shellies/announce
+      conditions:
+        - condition: template
+          value_template: "{{ trigger.payload_json.gen is not defined }}"
+      actions:
+        - action: python_script.shellies_discovery
+          data:
+            id: '{{ trigger.payload_json.id }}'
+            mac: '{{ trigger.payload_json.mac }}'
+            fw_ver: '{{ trigger.payload_json.fw_ver }}'
+            model: '{{ trigger.payload_json.model | default }}'
+            mode: '{{ trigger.payload_json.mode | default }}'
+            host: '{{ trigger.payload_json.ip }}'
+            discovery_prefix: 'homeassistant'
+            qos: 2
   # scripts.yaml:
   # scenes.yaml:

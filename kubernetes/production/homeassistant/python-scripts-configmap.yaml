@@ -1,0 +1,188 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homeassistant-python-scripts
+  namespace: homeassistant
+  labels:
+    app: homeassistant
+data:
+  shellies_discovery.py: |
+    """This script adds MQTT discovery support for Shellies devices."""
+    
+    VERSION = "5.3.2"
+    
+    ATTR_ICON = "icon"
+    ATTR_MANUFACTURER = "Allterco Robotics"
+    ATTR_POWER_AC = "ac"
+    ATTR_RELAY = "relay"
+    ATTR_ROLLER = "roller"
+    ATTR_SHELLY = "Shelly"
+    
+    ATTR_AVAILABILITY_EXTRA = "availability_extra"
+    
+    BUTTON_MUTE = "mute"
+    BUTTON_RESTART = "restart"
+    BUTTON_SELF_TEST = "self_test"
+    BUTTON_UNMUTE = "unmute"
+    BUTTON_VALVE_CLOSE = "valve_close"
+    BUTTON_VALVE_OPEN = "valve_open"
+    
+    COMP_FAN = "fan"
+    COMP_LIGHT = "light"
+    COMP_SWITCH = "switch"
+    
+    CONF_DEFAULT_HEAT_TEMP = "default_heating_temperature"
+    CONF_DEVELOP = "develop"
+    CONF_DEVICE_NAME = "device_name"
+    CONF_DISCOVERY_PREFIX = "discovery_prefix"
+    CONF_EXPIRE_AFTER = "expire_after"
+    CONF_EXT_SWITCH = "ext-switch"
+    CONF_FORCE_UPDATE_SENSORS = "force_update_sensors"
+    CONF_FRIENDLY_NAME = "friendly_name"
+    CONF_FW_VER = "fw_ver"
+    CONF_HOST = "host"
+    CONF_HUMIDITY_TOPIC = "humidity_topic"
+    CONF_ID = "id"
+    CONF_IGNORE_DEVICE_MODEL = "ignore_device_model"
+    CONF_IGNORED_DEVICES = "ignored_devices"
+    CONF_MAC = "mac"
+    CONF_MINIMAL_VALVE_POSITION = "minimal_valve_position"
+    CONF_MODE = "mode"
+    CONF_MODEL_ID = "model"
+    CONF_OPTIMISTIC = "optimistic"
+    CONF_POSITION_TEMPLATE = "position_template"
+    CONF_POWERED = "powered"
+    CONF_QOS = "qos"
+    CONF_SET_POSITION_TEMPLATE = "set_position_template"
+    CONF_USE_FAHRENHEIT = "use_fahrenheit"
+    CONF_VALVE_CONNECTED = "valve_connected"
+    
+    DEFAULT_DISC_PREFIX = "homeassistant"
+    
+    DEVICE_CLASS_AWNING = "awning"
+    DEVICE_CLASS_BATTERY = "battery"
+    DEVICE_CLASS_BATTERY_CHARGING = "battery_charging"
+    DEVICE_CLASS_BLIND = "blind"
+    DEVICE_CLASS_BUTTON = "button"
+    DEVICE_CLASS_COLD = "cold"
+    DEVICE_CLASS_CONNECTIVITY = "connectivity"
+    DEVICE_CLASS_CURRENT = "current"
+    DEVICE_CLASS_CURTAIN = "curtain"
+    DEVICE_CLASS_DAMPER = "damper"
+    DEVICE_CLASS_DOOR = "door"
+    DEVICE_CLASS_ENERGY = "energy"
+    DEVICE_CLASS_ENUM = "enum"
+    DEVICE_CLASS_FIRMWARE = "firmware"
+    DEVICE_CLASS_GARAGE = "garage"
+    DEVICE_CLASS_GARAGE_DOOR = "garage_door"
+    DEVICE_CLASS_GAS = "gas"
+    DEVICE_CLASS_GATE = "gate"
+    DEVICE_CLASS_HEAT = "heat"
+    DEVICE_CLASS_HUMIDITY = "humidity"
+    DEVICE_CLASS_ILLUMINANCE = "illuminance"
+    DEVICE_CLASS_LIGHT = "light"
+    DEVICE_CLASS_LOCK = "lock"
+    DEVICE_CLASS_MOISTURE = "moisture"
+    DEVICE_CLASS_MOTION = "motion"
+    DEVICE_CLASS_MOVING = "moving"
+    DEVICE_CLASS_OCCUPANCY = "occupancy"
+    DEVICE_CLASS_OPENING = "opening"
+    DEVICE_CLASS_PLUG = "plug"
+    DEVICE_CLASS_POWER = "power"
+    DEVICE_CLASS_POWER_FACTOR = "power_factor"
+    DEVICE_CLASS_PRESENCE = "presence"
+    DEVICE_CLASS_PRESSURE = "pressure"
+    DEVICE_CLASS_PROBLEM = "problem"
+    DEVICE_CLASS_RESTART = "restart"
+    DEVICE_CLASS_SAFETY = "safety"
+    DEVICE_CLASS_SHADE = "shade"
+    DEVICE_CLASS_SHUTTER = "shutter"
+    DEVICE_CLASS_SIGNAL_STRENGTH = "signal_strength"
+    DEVICE_CLASS_SMOKE = "smoke"
+    DEVICE_CLASS_SOUND = "sound"
+    DEVICE_CLASS_TEMPERATURE = "temperature"
+    DEVICE_CLASS_TIMESTAMP = "timestamp"
+    DEVICE_CLASS_UPDATE = "update"
+    DEVICE_CLASS_VIBRATION = "vibration"
+    DEVICE_CLASS_VOLTAGE = "voltage"
+    DEVICE_CLASS_WINDOW = "window"
+    
+    ENTITY_CATEGORY_CONFIG = "config"
+    ENTITY_CATEGORY_DIAGNOSTIC = "diagnostic"
+    
+    EXPIRE_AFTER_FOR_BATTERY_POWERED = int(1.2 * 12 * 60 * 60)
+    EXPIRE_AFTER_FOR_AC_POWERED = int(2.2 * 10 * 60)
+    EXPIRE_AFTER_FOR_SHELLY_MOTION = int(1.2 * 60 * 60)
+    EXPIRE_AFTER_FOR_SHELLY_VALVE = int(1.2 * 60 * 60)
+    
+    MAX_TRANSITION = 5000
+    MIN_4PRO_FIRMWARE_DATE = 20200408
+    MIN_PLUG_FIRMWARE_DATE = 20210115
+    MIN_MOTION_FIRMWARE_DATE = 20220517
+    MIN_MOTION2_FIRMWARE_DATE = 20220301
+    MIN_VALVE_FIRMWARE_DATE = 20231009
+    MIN_DIMMER_FIRMWARE_DATE = 20211109
+    MIN_HT_FIRMWARE_DATE = 20211109
+    MIN_FIRMWARE_DATE = 20220209
+    MAX_MQTT_TOPIC_LENGTH = 32
+    
+    def format_entity_name(string):
+        """Clean entity name."""
+        return string.replace("-", " ").replace("_", " ").replace("/", " ").capitalize()
+    
+    def format_device_name(string):
+        """Format device name."""
+        return string.replace("-", " ").replace("_", " ").replace("/", " ").title()
+    
+    def make_id(string):
+        """Make sensor id for config topic and unique_id."""
+        return string.replace(" ", "-").replace("/", "-")
+    
+    def format_mac(mac):
+        """Format the mac address string."""
+        return ":".join(mac[i : i + 2] for i in range(0, 12, 2))
+    
+    def parse_version(version):
+        """Parse version string and return version date integer."""
+        try:
+            if "-" in version:
+                return int(version.split("-", 1)[0])
+        except TypeError:
+            return version
+    
+    def mqtt_publish(topic, payload, retain, json=False):
+        """Publish data to MQTT broker."""
+        if json:
+            payload_str = str(payload).replace("'", '"').replace("^", '\\"')
+        else:
+            payload_str = str(payload).replace("'", '"').replace("^", "'")
+        service_data = {
+            "topic": topic,
+            "payload": payload_str,
+            "retain": retain,
+            "qos": 0,
+        }
+        logger.debug(service_data)  # noqa: F821
+        logger.debug("Sending to MQTT broker: %s %s", topic, payload_str)  # noqa: F821
+        hass.services.call("mqtt", "publish", service_data, False)  # noqa: F821
+    
+    # Main script entry point
+    fw_ver = data.get(CONF_FW_VER)  # noqa: F821
+    dev_id = data.get(CONF_ID)  # noqa: F821
+    host = data.get(CONF_HOST)  # noqa: F821
+    mac = data.get(CONF_MAC)  # noqa: F821
+    model_id = data.get(CONF_MODEL_ID)  # noqa: F821
+    
+    if not host:
+        raise ValueError(f"host value {host} is not valid, update shellies_discovery automation")
+    if not dev_id:
+        raise ValueError(f"id value {dev_id} is not valid, check script configuration")
+    if not mac:
+        raise ValueError(f"mac value {mac} is not valid, check script configuration")
+    if not fw_ver:
+        raise ValueError(f"fw_ver value {fw_ver} is not valid, check script configuration")
+    if not model_id:
+        raise ValueError(f"model_id value {model_id} is not valid, check script configuration")
+    
+    logger.info(f"Shellies Discovery: Processing {dev_id} ({model_id}) at {host}")  # noqa: F821
