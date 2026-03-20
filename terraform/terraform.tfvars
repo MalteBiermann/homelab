@@ -62,7 +62,7 @@ talos_image_url  = "https://factory.talos.dev/image/dc7b152cb3ea99b821fcb7340ce7
 
 # Talos Cluster Configuration
 talos_cluster_name     = "talos-proxmox-cluster"
-kubernetes_version     = "1.35.0"
+kubernetes_version     = "1.35.2"
 talos_cluster_endpoint = ""  # Leave empty to use first node IP, or set VIP/LB address
 
 

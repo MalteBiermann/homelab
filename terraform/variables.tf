@@ -169,7 +169,7 @@ variable "talos_cluster_name" {
 variable "kubernetes_version" {
   description = "Kubernetes version to install"
   type        = string
-  default     = "1.35.0"
+  default     = "1.35.2"
 }
 
 variable "talos_cluster_endpoint" {
