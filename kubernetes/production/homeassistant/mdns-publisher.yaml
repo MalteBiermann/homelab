@@ -6,6 +6,8 @@ metadata:
   namespace: homeassistant
   labels:
     app: mdns-publisher
+    app.kubernetes.io/name: mdns-publisher
+    app.kubernetes.io/instance: homeassistant
 spec:
   replicas: 1
   selector:
@@ -15,6 +17,8 @@ spec:
     metadata:
       labels:
         app: mdns-publisher
+        app.kubernetes.io/name: mdns-publisher
+        app.kubernetes.io/instance: homeassistant
     spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet

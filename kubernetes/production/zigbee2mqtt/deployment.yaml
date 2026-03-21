@@ -6,6 +6,8 @@ metadata:
   namespace: zigbee2mqtt
   labels:
     app: zigbee2mqtt
+    app.kubernetes.io/name: zigbee2mqtt
+    app.kubernetes.io/instance: zigbee2mqtt
 spec:
   replicas: 1
   strategy:
@@ -17,6 +19,8 @@ spec:
     metadata:
       labels:
         app: zigbee2mqtt
+        app.kubernetes.io/name: zigbee2mqtt
+        app.kubernetes.io/instance: zigbee2mqtt
     spec:
       securityContext:
         fsGroup: 1000

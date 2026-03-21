@@ -5,6 +5,8 @@ metadata:
   namespace: nginx-helloworld
   labels:
     app: nginx-helloworld
+    app.kubernetes.io/name: nginx-helloworld
+    app.kubernetes.io/instance: nginx-helloworld
 spec:
   replicas: 1
   selector:
@@ -14,6 +16,8 @@ spec:
     metadata:
       labels:
         app: nginx-helloworld
+        app.kubernetes.io/name: nginx-helloworld
+        app.kubernetes.io/instance: nginx-helloworld
     spec:
       containers:
       - name: nginx
