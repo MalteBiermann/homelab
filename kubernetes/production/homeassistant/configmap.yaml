@@ -29,6 +29,12 @@ data:
     automation: !include automations.yaml
     # script: !include scripts.yaml
     # scene: !include scenes.yaml
+
+    logger:
+      default: warning
+      logs:
+        homeassistant.components.python_script: debug
+        homeassistant.components.automation: info
   automations.yaml: |
     - id: shellies_announce
       alias: 'Shellies Announce'
