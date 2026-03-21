@@ -46,7 +46,7 @@ spec:
               memory: 32Mi
       containers:
         - name: booklore
-          image: grimmory/grimmory:v2.2.1
+          image: ghcr.io/grimmory-tools/grimmory:v2.3.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
