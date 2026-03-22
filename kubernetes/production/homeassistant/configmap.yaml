@@ -33,6 +33,7 @@ data:
     logger:
       default: warning
       logs:
+        py.warnings: error
         homeassistant.components.python_script: debug
         homeassistant.components.automation: info
   automations.yaml: |
@@ -58,15 +59,19 @@ data:
           topic: shellies/announce
       conditions:
         - condition: template
-          value_template: "{{ trigger.payload_json.gen is not defined }}"
+          value_template: >-
+            {{ trigger.payload_json is defined
+               and trigger.payload_json.id is defined
+               and trigger.payload_json.ip is defined
+               and trigger.payload_json.gen is not defined }}
       actions:
         - action: python_script.shellies_discovery
           data:
             id: '{{ trigger.payload_json.id }}'
-            mac: '{{ trigger.payload_json.mac }}'
-            fw_ver: '{{ trigger.payload_json.fw_ver }}'
-            model: '{{ trigger.payload_json.model | default }}'
-            mode: '{{ trigger.payload_json.mode | default }}'
+            mac: '{{ trigger.payload_json.mac | default("", true) }}'
+            fw_ver: '{{ trigger.payload_json.fw_ver | default("", true) }}'
+            model: '{{ trigger.payload_json.model | default("", true) }}'
+            mode: '{{ trigger.payload_json.mode | default("", true) }}'
             host: '{{ trigger.payload_json.ip }}'
             discovery_prefix: 'homeassistant'
             qos: 2
