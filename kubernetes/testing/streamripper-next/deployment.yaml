@@ -53,6 +53,9 @@ spec:
           workingDir: /app
           securityContext:
             allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
             capabilities:
               drop:
               - ALL
@@ -60,7 +63,7 @@ spec:
             - sh
             - -c
             - |
-              pip install flask -q && python file-manager.py
+              python -m pip install --no-cache-dir --disable-pip-version-check flask -q --target /tmp/pydeps && PYTHONPATH=/tmp/pydeps python file-manager.py
           ports:
             - containerPort: 5000
           volumeMounts:

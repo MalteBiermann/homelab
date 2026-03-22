@@ -10,7 +10,7 @@ data:
       - name: Oldenburg Eins (HF)
         timezone: Europe/Berlin
         schedule_url: https://oeins.de/hf-programm/
-        stream_url: https://oeins.de/stream/oeins.mp3
+        stream_url: https://oeins.de/oeins
         episode_match: "Thrash till Death"
         default_duration_minutes: 60
         parser:
@@ -18,7 +18,7 @@ data:
           title_selector: "td:nth-child(2)"
           time_selector: "td:nth-child(1)"
           time_format: "%H:%M"
-          schedule_is_for: "tomorrow"
+          schedule_is_for: "today"
   file-manager.py: |
     from flask import Flask, render_template_string, request, send_file, jsonify
     import os
