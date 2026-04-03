@@ -41,6 +41,10 @@ data:
             href: http://zigbee2mqtt.local.biermann.uk/
             icon: router
             description: Zigbee Devices
+        - HomeBridge:
+            href: http://homebridge.server:8581/
+            icon: homebridge
+            description: Apple Homekit Home Bridge
     - Media:
         - Booklore:
             href: http://booklore.local.biermann.uk/
